@@ -49,12 +49,12 @@ class webServerHandler(BaseHTTPRequestHandler):
                 restaurants = session.query(Restaurant).all()
 
                 output = ""
-                output = "<a href = 'restaurants/new'> Make a New Restaruant </a></br>"
+                output = "<a href = 'restaurants/new'><h1> Make a New Restaruant</h1> </a></br>"
                 output += "<html><body>"
                 for restaurant in restaurants:
-                  output += "</br></br>{}</br>".format(restaurant.name)
+                  output += "</br></br><h1>{}</h1></br>".format(restaurant.name)
                   output += "<a href = 'restaurants/%d/edit'>Edit</a> </br>" % restaurant.id
-                  output += "<a href = '#'>Delete</a>"
+                  output += "<a href = 'restaurants/%d/delete'>Delete</a>" % restaurant.id
 
                 output += "</body></html>"
                 self.wfile.write(output)
@@ -87,6 +87,23 @@ class webServerHandler(BaseHTTPRequestHandler):
                 output += "</body></html>"
                 self.wfile.write(output)
                 print output
+                return                 
+            
+            if self.path.endswith("/delete"):
+                restid = self.path.split('/')[2]
+                rest_update = session.query(Restaurant).filter_by(id = int(restid)).first()
+                print "deleting " + rest_update.name
+                self.send_response(200)
+                self.send_header('Content-type', 'text/html')
+                self.end_headers()
+                output = ""
+                output += "<html><body>"
+                output += "<h1>Are you sure you want to delete %s?</h1>" % rest_update.name
+                output += '''<form method='POST' enctype='multipart/form-data' action='/restaurants/{}/delete'><input type="submit" value="Delete"> </form>'''.format(restid)
+                output += "</body></html>"
+                self.wfile.write(output)
+                print output
+                return                 
 
 
         except IOError:
@@ -131,6 +148,22 @@ class webServerHandler(BaseHTTPRequestHandler):
               self.send_header('Content-type', 'text/html')
               self.send_header('Location', '/restaurants')
               self.end_headers()
+
+                  
+          if self.path.endswith("/delete"):
+            ctype, pdict = cgi.parse_header(
+                self.headers.getheader('content-type'))
+            restid = self.path.split('/')[2]
+            rest_update = session.query(Restaurant).filter_by(id = int(restid)).first()
+            print "restaurant to be deleted: %s" % rest_update.name
+            output = ""
+            session.delete(rest_update)
+            session.commit()
+
+            self.send_response(301)
+            self.send_header('Content-type', 'text/html')
+            self.send_header('Location', '/restaurants')
+            self.end_headers()
 
         except:
             pass
