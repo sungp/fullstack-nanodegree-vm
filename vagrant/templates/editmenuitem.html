@@ -2,7 +2,13 @@
 
 <body>
 
-<!-- INSERT YOUR CODE HERE -->
+  <h1>Edit Menu Item</h1>
+  <form action="{{ url_for('editMenuItem', restaurant_id= restaurant_id, MenuID = MenuID) }}" method= 'post'>
+
+    <p>Name:</p>
+    <input type = 'text' size = '30' name = 'name' placeholder = {{item.name}}>
+    <input type='submit' value = 'Edit'>
+  </form>
 
 </body>
 
