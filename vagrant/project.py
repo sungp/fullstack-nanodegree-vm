@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 app = Flask(__name__)
 
 from sqlalchemy import create_engine
@@ -39,17 +39,16 @@ def newMenuItem(restaurant_id):
 @app.route('/restaurants/<int:restaurant_id>/<int:menu_id>/edit', methods = ['GET', 'POST'])
 def editMenuItem(restaurant_id, menu_id):
 	editedItem = session.query(MenuItem).filter_by(id = menu_id).one()
+        originalName = editedItem.name
 	if request.method == 'POST':
-		if request.form['name']:
-			editedItem.name = request.form['name']
-		if request.form['description']:
-			editedItem.description = request.form['name']
-		if request.form['price']:
-			editedItem.price = request.form['price']
-		if request.form['course']:
-			editedItem.course = request.form['course']
+	        editedItem.name = request.form.get('name')
+	        editedItem.description = request.form.get('name')
+	        editedItem.price = request.form.get('price')
+	        editedItem.course = request.form.get('course')
 		session.add(editedItem)
 		session.commit()
+                flash("menu item {} has been edited to {}".format(originalName, editedItem.name))
+                #flash("menu item has been edited")
 		return redirect(url_for('restaurantMenu', restaurant_id = restaurant_id))
 	else:
 		
@@ -62,11 +61,13 @@ def deleteMenuItem(restaurant_id, menu_id):
 	if request.method == 'POST':
             session.delete(deleteItem)
             session.commit()
+            flash("menu item {} has been deleted".format(deleteItem.name))
 	    return redirect(url_for('restaurantMenu', restaurant_id = restaurant_id))
 	else:
             return render_template('deletemenuitem.html', item = deleteItem)
 
 
 if __name__ == '__main__':
+        app.secret_key = 'super_secret_key'
 	app.debug = True
 	app.run(host = '0.0.0.0', port = 5000)
