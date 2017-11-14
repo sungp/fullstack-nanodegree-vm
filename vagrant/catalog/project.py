@@ -259,7 +259,10 @@ def deleteRestaurant(restaurant_id):
 
 @app.route('/catalog/<int:category_id>/item/')
 def showItem(category_id):
-  return "category id = %d" % {category_id}
+    category = session.query(Category).filter_by(id=category_id).one()
+    items = session.query(Item).filter_by(cat_id=category_id).all()
+    return render_template('items.html', items=items, category=category)
+  
 
 # Create a new menu item
 @app.route('/restaurant/<int:restaurant_id>/menu/new/', methods=['GET', 'POST'])
