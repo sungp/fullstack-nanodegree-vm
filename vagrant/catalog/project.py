@@ -11,6 +11,7 @@ import httplib2
 import json
 from flask import make_response
 import requests
+from datetime import datetime
 
 app = Flask(__name__)
 
@@ -256,7 +257,6 @@ def deleteRestaurant(restaurant_id):
         return render_template('deleteRestaurant.html', restaurant=restaurantToDelete)
 
 # Show items 
-
 @app.route('/catalog/<int:category_id>/item/')
 def showItem(category_id):
     category = session.query(Category).filter_by(id=category_id).one()
@@ -264,7 +264,22 @@ def showItem(category_id):
     return render_template('items.html', items=items, category=category)
   
 
-# Create a new menu item
+# Create a new item
+@app.route('/catalog/new/', methods=['GET', 'POST'])
+def newItem():
+    if 'username' not in login_session:
+        return redirect('/login')
+    if request.method == 'POST':
+        newItem = Item(title=request.form['title'], description=request.form['description'], 
+            cat_id=request.form['category_id'], user_id=login_session['user_id'], date_added = datetime.now())
+        session.add(newItem)
+        session.commit()
+        flash('New %s Item Successfully Created' % (newItem.title))
+        return redirect(url_for('showCatalog'))
+    else:
+        return render_template('newitem.html')
+
+
 @app.route('/restaurant/<int:restaurant_id>/menu/new/', methods=['GET', 'POST'])
 def newMenuItem(restaurant_id):
     if 'username' not in login_session:
