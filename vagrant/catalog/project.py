@@ -274,7 +274,7 @@ def showItem(category_name, item_title):
     if 'username' not in login_session:
       return render_template('public_item.html', item=item)
     else:
-      return render_template('public_item.html', item=item)
+      return render_template('item.html', category = category, item = item)
   
 
 # Create a new item
@@ -294,6 +294,27 @@ def newItem():
 
 
 # Edit a menu item
+@app.route('/catalog/<category_name>/<item_title>/edit', methods=['GET', 'POST'])
+def editItem(category_name, item_title):
+    if 'username' not in login_session:
+        return redirect('/login')
+    category = session.query(Category).filter_by(name=category_name).one()
+    editedItem = session.query(Item).filter_by(title=item_title).one()
+    #if login_session['user_id'] != editedItem.user_id:
+    #    return "<script>function myFunction() {alert('You are not authorized to edit this item');}</script><body onload='myFunction()'>"
+    if request.method == 'POST':
+        if request.form['title']:
+            editedItem.name = request.form['title']
+        if request.form['description']:
+            editedItem.description = request.form['description']
+        session.add(editedItem)
+        session.commit()
+        flash('Item Successfully Edited')
+        return redirect(url_for('showItem', category_name = category_name, item_title = item_title)) 
+    else:
+        return render_template('edititem.html', category=category, item=editedItem)
+
+
 
 @app.route('/restaurant/<int:restaurant_id>/menu/<int:menu_id>/edit', methods=['GET', 'POST'])
 def editMenuItem(restaurant_id, menu_id):
