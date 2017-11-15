@@ -6,14 +6,8 @@
     <a href="{{url_for('showLogin')}}">Click Here to Log in </a>
   </div>
 </div>
-<div class="row divider blue">
+<div class="row divider green">
   <div class="col-md-12"></div>
-</div>
-<div class="row banner main">
-  <div class="col-md-1"></div>
-  <div class="col-md-11 padding-none">
-    <h1>Catalog</h1>
-  </div>
 </div>
 
 <div class = 'flash'>
@@ -30,22 +24,14 @@
 
 </div>
 
-<div class="row padding-top padding-bottom">
+<div class="row">
   <div class="col-md-1"></div>
-  <div class="col-md-10 padding-none">
-
+  <div class="col-md-3">
+    <div class="cat-item">
+      <h3>{{item.title}}</h3>
+      <p>{{item.description}}</p>
+    </div>
   </div>
   <div class="col-md-1"></div>
 </div>
-{% for category in categories %}
-<a href = "{{url_for('showCategory', category_name = category.name)}}">
-  <div class="row">
-    <div class="col-md-1"></div>
-    <div class="col-md-10 category-list">
-      <h3>{{category.name}}</h3>
-    </div>
-    <div class="col-md-1"></div>
-  </div>
-</a>
-{% endfor %}
 {% endblock %}
