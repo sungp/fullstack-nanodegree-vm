@@ -18,8 +18,7 @@ class User(Base):
 class Category(Base):
     __tablename__ = 'category'
 
-    id = Column(Integer, primary_key=True)
-    name = Column(String(250), nullable=False)
+    name = Column(String(250), primary_key=True)
 
 
 class Item(Base):
@@ -28,7 +27,7 @@ class Item(Base):
     title = Column(String(80), nullable=False)
     id = Column(Integer, primary_key=True)
     description = Column(String(250))
-    cat_id = Column(Integer, ForeignKey('category.id'))
+    category_name = Column(Integer, ForeignKey('category.name'))
     category = relationship(Category)
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
