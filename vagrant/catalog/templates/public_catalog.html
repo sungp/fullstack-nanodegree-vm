@@ -56,7 +56,7 @@
   {% for i in items %}
   <a href = "{{url_for('showItem', category_name = i.category_name, item_title = i.title)}}">
     <div class="cat-item">
-      <h3>{{i.name}}</h3>
+      <h3>{{i.title}}</h3>
       <p>{{i.category_name}}</p>
     </div>
   </a>
