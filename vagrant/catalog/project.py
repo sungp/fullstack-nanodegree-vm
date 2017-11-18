@@ -192,7 +192,7 @@ def gdisconnect():
 
 
 @app.route('/catalog/JSON')
-def restaurantsJSON():
+def catalogJSON():
   restaurants = session.query(Restaurant).all()
   return jsonify(restaurants=[r.serialize for r in restaurants])
 
@@ -301,8 +301,6 @@ def deleteItem(category_name, item_title):
     return redirect('/login')
   category = session.query(Category).filter_by(name=category_name).one()
   itemToDelete = session.query(Item).filter_by(title=item_title).one()
-  #if login_session['user_id'] != restaurant.user_id:
-  #    return "<script>function myFunction() {alert('You are not authorized to delete menu items to this restaurant. Please create your own restaurant in order to delete items.');}</script><body onload='myFunction()'>"
   if request.method == 'POST':
     session.delete(itemToDelete)
     session.commit()
