@@ -235,21 +235,29 @@ def newItem():
   if 'username' not in login_session:
     return redirect('/login')
   if request.method == 'POST':
-    category_name = request.form['category_name']
+    category_name = request.form['category_name'].strip()
+    if not category_name:
+      return "<script>function myFunction() {alert('You must specify category name');}</script><body onload='myFunction()'>"
+    
+    item_title = request.form['title'].strip()
+    if not item_title:
+      return "<script>function myFunction() {alert('You must specify item name');}</script><body onload='myFunction()'>"
+    
     category = getCategory(category_name)
     if category == None:
       newCategory = Category(name = category_name)
       session.add(newCategory)
       session.commit()
 
-    newItem = Item(title=request.form['title'], description=request.form['description'], 
-        category_name=request.form['category_name'], user_id=login_session['user_id'], date_added = datetime.now())
+    newItem = Item(title=item_title, description=request.form['description'], 
+        category_name=category_name, user_id=login_session['user_id'], date_added = datetime.now())
     session.add(newItem)
     session.commit()
     flash('New %s Item Successfully Created' % (newItem.title))
     return redirect(url_for('showCatalog'))
   else:
-    return render_template('newitem.html')
+    categories = session.query(Category).order_by(asc(Category.name))
+    return render_template('newitem.html', categories = categories)
 
 
 # Edit an item
@@ -257,30 +265,32 @@ def newItem():
 def editItem(category_name, item_title):
   if 'username' not in login_session:
     return redirect('/login')
-  category = session.query(Category).filter_by(name=category_name).one()
-  editedItem = session.query(Item).filter_by(title=item_title).one()
-  #if login_session['user_id'] != editedItem.user_id:
+    
+  itemToEdit = session.query(Item).filter_by(title=item_title).one()
+  #if login_session['user_id'] != itemToEdit.user_id:
   #    return "<script>function myFunction() {alert('You are not authorized to edit this item');}</script><body onload='myFunction()'>"
   if request.method == 'POST':
-    if request.form['title']:
-      editedItem.title = request.form['title']
+    if request.form['title'] and request.form['title'].strip():
+      itemToEdit.title = request.form['title'].strip()
     if request.form['description']:
-      editedItem.description = request.form['description']
-    if request.form['category_name']:
-      category_name = request.form['category_name']
+      itemToEdit.description = request.form['description']
+    if request.form['category_name'] and request.form['category_name'].strip():
+      category_name = request.form['category_name'].strip()
       category = getCategory(category_name)
       if category == None:
         newCategory = Category(name = category_name)
         session.add(newCategory)
         session.commit()
-      editedItem.category_name = category_name
-    editedItem.user_id=login_session['user_id']
-    session.add(editedItem)
+      itemToEdit.category_name = category_name
+    itemToEdit.user_id=login_session['user_id']
+    session.add(itemToEdit)
     session.commit()
     flash('Item Successfully Edited')
-    return redirect(url_for('showItem', category_name = category_name, item_title = editedItem.title)) 
+    return redirect(url_for('showItem', category_name = category_name, item_title = itemToEdit.title)) 
   else:
-    return render_template('edititem.html', category=category, item=editedItem)
+    category = getCategory(category_name)
+    categories = session.query(Category).order_by(asc(Category.name))
+    return render_template('edititem.html', category=category, item=itemToEdit, categories = categories)
 
 
 

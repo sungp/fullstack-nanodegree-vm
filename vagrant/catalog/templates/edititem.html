@@ -20,16 +20,13 @@
         <textarea class="form-control" maxlength="250" rows="3" name="description">{{item.description}}</textarea>
         
         <label for="category">Category:</label>
-        <div class="radio">
-          <label>
-            <input type="radio" name="category_name" id="category1" value="Soccer">Soccer
-          </label>
-        </div>
-        <div class="radio">
-          <label>
-            <input type="radio" name="category_name" id="category2" value="Swimming">Swimming
-          </label>
-        </div>
+        <input type="text" name="category_name" list="categories" placeholder="{{category.name}}">
+        <datalist id='categories'>
+          {% for category in categories %}
+          <option value="{{category.name}}">
+          {% endfor %}
+        </datalist>
+        <br><br>
         <button type="submit" class="btn btn-default" id="submit" type="submit">
           <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>Save</button>
         <a href = '{{url_for('showItem', category_name = category.name, item_title = item.title)}}'>
