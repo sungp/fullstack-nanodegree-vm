@@ -120,7 +120,7 @@ def gconnect():
   login_session['user_id'] = user_id
   output = ''
   output += '<h1>Welcome, '
-  output += login_session['username']
+  output += login_session['email']
   output += '!</h1>'
   output += '<img src="'
   output += login_session['picture']
@@ -274,8 +274,8 @@ def editItem(category_name, item_title):
     return redirect('/login')
     
   itemToEdit = session.query(Item).filter_by(title=item_title).one()
-  #if login_session['user_id'] != itemToEdit.user_id:
-  #    return "<script>function myFunction() {alert('You are not authorized to edit this item');}</script><body onload='myFunction()'>"
+  if login_session['user_id'] != itemToEdit.user_id:
+      return "<script>function myFunction() {alert('You are not authorized to edit this item');}</script><body onload='myFunction()'>"
   if request.method == 'POST':
     if request.form['title'] and request.form['title'].strip():
       itemToEdit.title = request.form['title'].strip()
@@ -308,6 +308,8 @@ def deleteItem(category_name, item_title):
     return redirect('/login')
   category = session.query(Category).filter_by(name=category_name).one()
   itemToDelete = session.query(Item).filter_by(title=item_title).one()
+  if login_session['user_id'] != itemToDelete.user_id:
+      return "<script>function myFunction() {alert('You are not authorized to delete this item');}</script><body onload='myFunction()'>"
   if request.method == 'POST':
     session.delete(itemToDelete)
     session.commit()
