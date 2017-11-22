@@ -18,7 +18,16 @@ class User(Base):
 class Category(Base):
     __tablename__ = 'category'
 
-    name = Column(String(250), primary_key=True)
+    id = Column(Integer, primary_key=True)
+    name = Column(String(250), unique=True, nullable=False)
+    def do_serialize(self, items = []):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'Item': [item.serialize for item in items] 
+        }
+
+    serialize = property(do_serialize)
 
 
 class Item(Base):
@@ -39,7 +48,7 @@ class Item(Base):
     def serialize(self):
 
         return {
-            'cat_id': self.cat_id,
+            'category_name': self.category_name,
             'description': self.description,
             'id': self.id,
             'title': self.title,

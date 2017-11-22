@@ -159,6 +159,13 @@ def getCategory(name):
   except:
     return None
 
+def getItems(category_name):
+  try:
+    items = session.query(Item).filter_by(category_name = category_name).all()
+    return items 
+  except:
+    return [] 
+
 # DISCONNECT - Revoke a current user's token and reset their login_session
 @app.route('/gdisconnect')
 def gdisconnect():
@@ -193,8 +200,8 @@ def gdisconnect():
 
 @app.route('/catalog/JSON')
 def catalogJSON():
-  restaurants = session.query(Restaurant).all()
-  return jsonify(restaurants=[r.serialize for r in restaurants])
+  categories = session.query(Category).all()
+  return jsonify(categories = [cat.do_serialize(getItems(cat.name)) for cat in categories])
 
 
 # Show all categories 
